@@ -25,25 +25,42 @@ import org.lwjgl.opengl.GL11;
 public class TileEntityBedRenderer extends TileEntitySpecialRenderer {
 
     public WavefrontObject bedModel;
-    private int displayListID;
+    private int displayListID = 0;
 
     public TileEntityBedRenderer() {
         this.bedModel = (WavefrontObject) AdvancedModelLoader.loadModel(new ResourceLocation("rorax:PBed.obj"));
-
-        //Should this be generated here?
-        //Uses more memory but reduces CPU usage
-        this.displayListID = GLAllocation.generateDisplayLists(1);
-        GL11.glNewList(this.displayListID, GL11.GL_COMPILE);
-        this.bedModel.renderAll();
-        GL11.glEndList();
     }
 
     @Override
-    public void renderTileEntityAt(TileEntity p_147500_1_, double x, double y, double z, float p_147500_8_) {
+    public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float p_147500_8_) {
+        //ID is 0 if unset or it failed to create to create list
+        if (this.displayListID == 0) {
+            this.displayListID = GLAllocation.generateDisplayLists(1);
+            GL11.glNewList(this.displayListID, GL11.GL_COMPILE);
+            this.bindTexture(new ResourceLocation("rorax:pbed.png"));
+            this.bedModel.renderAll();
+            GL11.glEndList();
+        }
+
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_CULL_FACE);
-        GL11.glTranslated(x, y, z);
-        this.bindTexture(new ResourceLocation("rorax:pbed.png"));
+        if (tileEntity != null) {
+            if (tileEntity.blockMetadata == 0) {
+                GL11.glTranslated(x + 1D, y, z);
+                GL11.glRotatef(180F, 0F, 1F, 0F);
+            }
+            else if (tileEntity.blockMetadata == 1) {
+                GL11.glTranslated(x + 1D, y, z + 1D);
+                GL11.glRotatef(90F, 0F, 1F, 0F);
+            }
+            else if (tileEntity.blockMetadata == 2) {
+                GL11.glTranslated(x, y, z + 1D);
+            }
+            else if (tileEntity.blockMetadata == 3) {
+                GL11.glTranslated(x, y, z);
+                GL11.glRotatef(90F, 0F, -1F, 0F);
+            }
+        }
         GL11.glCallList(this.displayListID);
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glPopMatrix();

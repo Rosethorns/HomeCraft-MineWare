@@ -16,7 +16,7 @@ package hcmw.proxy;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import hcmw.client.render.TileEntityBedRenderer;
-import hcmw.common.tileentity.TileEntityBase;
+import hcmw.common.tileentity.TileEntityBed;
 
 /**
  * A client side proxy for stuff that should only be done client side
@@ -25,6 +25,7 @@ public class ProxyClient extends ProxyCommon {
 
     @Override
     public void registerRenderers() {
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBase.class, new TileEntityBedRenderer());
+        //TODO this only temp for now, need to find a good solution to allow for modules
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBed.class, new TileEntityBedRenderer());
     }
 }
