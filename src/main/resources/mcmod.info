@@ -1,0 +1,14 @@
+[{
+    "modid": "PlayerBeacons",
+    "name": "Player Beacons",
+    "description": "Tap into the power of the end to enhance yourself",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "http://kihirakreations.co.uk/",
+    "updateUrl": "http://kihirakreations.co.uk/",
+    "authors": [ "Kihira", "Nexans20" ],
+    "credits": "Code by Kihira, Textures by Nexans",
+    "logoFile": "",
+    "screenshots": [ ],
+    "dependencies": [  ]
+}]
