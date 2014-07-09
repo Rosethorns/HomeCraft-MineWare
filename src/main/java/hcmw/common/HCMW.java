@@ -20,8 +20,9 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import hcmw.common.block.BlockBedBase;
 import hcmw.common.block.BlockBounding;
-import hcmw.common.item.ItemBedBase;
+import hcmw.common.item.ItemMultiBlock;
 import hcmw.common.tileentity.TileEntityBase;
+import hcmw.common.tileentity.TileEntityBed;
 import hcmw.common.tileentity.TileEntityBounding;
 import hcmw.proxy.ProxyCommon;
 import net.minecraft.block.Block;
@@ -50,10 +51,11 @@ public class HCMW {
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent e) {
-        GameRegistry.registerBlock(blockBed, ItemBedBase.class, "blockBedTest");
+        GameRegistry.registerBlock(blockBed, ItemMultiBlock.class, "blockBedTest");
         GameRegistry.registerBlock(blockBounding, "blockBounding");
 
         GameRegistry.registerTileEntity(TileEntityBase.class, HCMW.MOD_ID + ":base");
+        GameRegistry.registerTileEntity(TileEntityBed.class, HCMW.MOD_ID + ":bed");
         GameRegistry.registerTileEntity(TileEntityBounding.class, HCMW.MOD_ID + ":bounding");
 
         proxy.registerRenderers();

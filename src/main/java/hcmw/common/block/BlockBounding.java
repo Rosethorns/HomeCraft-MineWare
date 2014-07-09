@@ -1,17 +1,18 @@
 package hcmw.common.block;
 
 import hcmw.common.tileentity.TileEntityBounding;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import java.util.Random;
+
 /**
  * A bounding block that is mostly to prevent players from entering the block as well as passing on any needed calls
  */
-public class BlockBounding extends BlockContainer {
+public class BlockBounding extends BlockMultiBlock {
 
     public BlockBounding() {
         super(Material.wood);
@@ -23,13 +24,8 @@ public class BlockBounding extends BlockContainer {
     }
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        super.breakBlock(world, x, y, z, block, meta);
-        TileEntityBounding tileEntity = (TileEntityBounding) world.getTileEntity(x, y, z);
-        Block parentBlock = world.getBlock((int) tileEntity.parentX, (int) tileEntity.parentY, (int) tileEntity.parentZ);
-        if (parentBlock != null) {
-            parentBlock.breakBlock(world, (int) tileEntity.parentX, (int) tileEntity.parentY, (int) tileEntity.parentZ, parentBlock, meta);
-        }
+    public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
+        return Item.getItemById(-1);
     }
 
     @Override

@@ -16,113 +16,25 @@ package hcmw.common.block;
 
 import hcmw.common.HCMW;
 import hcmw.common.tileentity.TileEntityBed;
-import hcmw.common.tileentity.TileEntityBounding;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-public class BlockBedBase extends BlockContainer {
-
-    //TODO should we store bed data per tile entity or create a new block for each one
-    private float[] boundingBoxMax = new float[]{2F, 3F, 2F};
+public class BlockBedBase extends BlockMultiBlock {
 
     public BlockBedBase() {
         super(Material.wood);
         setCreativeTab(HCMW.tabHCMW);
     }
 
-    public float[] getBoundingBoxMax() {
-        if (this.boundingBoxMax == null || this.boundingBoxMax.length < 3) {
-            this.boundingBoxMax = new float[]{1F, 1F, -1F};
-        }
-        return this.boundingBoxMax;
-    }
-
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack itemStack) {
+    @Override
+    public void onPostBlockPlaced(World world, int x, int y, int z, int meta) {
         if (!world.isRemote) {
-            int facing = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+            //Set this as the parent and create the structure
+            TileEntityBed tileEntityBed = (TileEntityBed) world.getTileEntity(x, y, z);
 
-            BlockBedBase item = (BlockBedBase) Block.getBlockFromItem(itemStack.getItem());
-            float[] boundingBoxMax = item.getBoundingBoxMax();
-
-            //Set the blocks for the bounding box
-            switch (facing) {
-                //South
-                case 0: {
-                    for (int checkX = x; checkX > x - boundingBoxMax[0]; checkX--) {
-                        for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                            for (int checkZ = z; checkZ < z + boundingBoxMax[2]; checkZ++) {
-                                if (!(checkX == x && checkY == y && checkZ == z)) {
-                                    this.setBoundingBlock(world, x, y, z, checkX, checkY, checkZ);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-                //West
-                case 1: {
-                    for (int checkX = x; checkX > x - boundingBoxMax[2]; checkX--) {
-                        for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                            for (int checkZ = z; checkZ > z - boundingBoxMax[0]; checkZ--) {
-                                if (!(checkX == x && checkY == y && checkZ == z)) {
-                                    this.setBoundingBlock(world, x, y, z, checkX, checkY, checkZ);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-                //North
-                case 2: {
-                    for (int checkX = x; checkX < x + boundingBoxMax[0]; checkX++) {
-                        for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                            for (int checkZ = z; checkZ > z - boundingBoxMax[2]; checkZ--) {
-                                if (!(checkX == x && checkY == y && checkZ == z)) {
-                                    this.setBoundingBlock(world, x, y, z, checkX, checkY, checkZ);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-                //East
-                case 3: {
-                    for (int checkX = x; checkX < x + boundingBoxMax[2]; checkX++) {
-                        for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                            for (int checkZ = z; checkZ < z + boundingBoxMax[0]; checkZ++) {
-                                if (!(checkX == x && checkY == y && checkZ == z)) {
-                                    this.setBoundingBlock(world, x, y, z, checkX, checkY, checkZ);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the target block as an invisible bounding box that passes any calls onto it's parent. TODO Move to a util
-     * @param world The world
-     * @param parentX The parent x pos
-     * @param parentY The parent y pos
-     * @param parentZ The parent z pos
-     * @param posX The target x pos
-     * @param posY The target y pos
-     * @param posZ The target z pos
-     */
-    private void setBoundingBlock(World world, int parentX, int parentY, int parentZ, int posX, int posY, int posZ) {
-        //Set the block and verify
-        if (world.setBlock(posX, posY, posZ, HCMW.blockBounding)) {
-            TileEntityBounding tileEntityBounding = (TileEntityBounding) world.getTileEntity(posX, posY, posZ);
-            tileEntityBounding.setParent(parentX, parentY, parentZ);
+            tileEntityBed.setIsParent();
+            this.createStructure(world, x, y, z, meta);
         }
     }
 

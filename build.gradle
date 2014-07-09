@@ -18,8 +18,8 @@ buildscript {
 apply plugin: 'forge'
 
 version = "0.0.1"
-group= "kihira.rorax" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Rorax"
+group= "hcmw" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "HomeCraft-MineWare"
 
 minecraft {
     version = "1.7.10-10.13.0.1170"
