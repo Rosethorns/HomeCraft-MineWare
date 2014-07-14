@@ -45,18 +45,18 @@ public class TileEntityBedRenderer extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_CULL_FACE);
         if (tileEntity != null) {
-            if (tileEntity.blockMetadata == 0) {
+            if (tileEntity.getBlockMetadata() == 0) {
                 GL11.glTranslated(x + 1D, y, z);
                 GL11.glRotatef(180F, 0F, 1F, 0F);
             }
-            else if (tileEntity.blockMetadata == 1) {
+            else if (tileEntity.getBlockMetadata() == 1) {
                 GL11.glTranslated(x + 1D, y, z + 1D);
                 GL11.glRotatef(90F, 0F, 1F, 0F);
             }
-            else if (tileEntity.blockMetadata == 2) {
+            else if (tileEntity.getBlockMetadata() == 2) {
                 GL11.glTranslated(x, y, z + 1D);
             }
-            else if (tileEntity.blockMetadata == 3) {
+            else if (tileEntity.getBlockMetadata() == 3) {
                 GL11.glTranslated(x, y, z);
                 GL11.glRotatef(90F, 0F, -1F, 0F);
             }
