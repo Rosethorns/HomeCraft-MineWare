@@ -60,32 +60,9 @@ public class BlockBedBase extends BlockMultiBlock {
         return false;
     }
 
-/*    @Override
-    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB par5AxisAlignedBB, List list, Entity entity) {
-        //TODO adjust per rotation
-        if (this.boundingBox != null && this.boundingBox.length == 6) {
-            this.setBlockBounds(this.boundingBox[0], this.boundingBox[1], this.boundingBox[2], this.boundingBox[3], this.boundingBox[4], this.boundingBox[5]);
-        }
-        else {
-            this.setBlockBounds(0F, 0F, 0F, 1F, 1F, 1F);
-        }
-        super.addCollisionBoxesToList(world, x, y, z, par5AxisAlignedBB, list, entity);
-    }
-
-    @Override
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
-        this.boundingBox = new float[]{0F, 0F, 0F, 2F, 3F, -2F};
-        if (this.boundingBox != null && this.boundingBox.length == 6) {
-            return AxisAlignedBB.getBoundingBox(x + this.boundingBox[0], y + this.boundingBox[1], z + this.boundingBox[2], x + this.boundingBox[3], y + this.boundingBox[4], z + this.boundingBox[5]);
-        }
-        else return AxisAlignedBB.getBoundingBox(x + 0F, y + 0F, z + 0F, x + 1F, y + 1F, z + 1F);
-    }*/
-
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_) {
-        if (world.isRemote) {
-            return true;
-        }
+        if (world.isRemote) return true;
         else {
             int metadata = world.getBlockMetadata(x, y, z);
 

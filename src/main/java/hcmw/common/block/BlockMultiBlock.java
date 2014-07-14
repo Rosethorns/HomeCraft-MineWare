@@ -1,5 +1,7 @@
 package hcmw.common.block;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hcmw.common.HCMW;
 import hcmw.common.tileentity.TileEntityBounding;
 import hcmw.common.tileentity.TileEntityMultiBlock;
@@ -7,6 +9,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
 public abstract class BlockMultiBlock extends BlockContainer {
@@ -237,5 +241,36 @@ public abstract class BlockMultiBlock extends BlockContainer {
             TileEntityBounding tileEntityBounding = (TileEntityBounding) world.getTileEntity(posX, posY, posZ);
             tileEntityBounding.setParent(parentX, parentY, parentZ);
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Item getItem(World world, int x, int y, int z) {
+        TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
+
+        if (tileEntity != null) {
+            if (tileEntity.isParent) return Item.getItemFromBlock(this);
+            else {
+                return Item.getItemFromBlock(world.getBlock(tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ));
+            }
+        }
+        else return null;
+    }
+
+    //TODO Make this work with all angles. Currently only works for east direction
+    @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
+        TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
+        if (this.boundingBoxMax != null && this.boundingBoxMax.length == 3 && tileEntity != null) {
+            if (!tileEntity.isParent) {
+                return AxisAlignedBB.getBoundingBox(tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ,
+                        tileEntity.parentX + this.boundingBoxMax[0], tileEntity.parentY + this.boundingBoxMax[1], tileEntity.parentZ + this.boundingBoxMax[2]);
+            }
+            else {
+                return AxisAlignedBB.getBoundingBox(x, y, z, x + this.boundingBoxMax[0], y + this.boundingBoxMax[1], z + this.boundingBoxMax[2]);
+            }
+        }
+        else return AxisAlignedBB.getBoundingBox(x, y, z, x + 1F, y + 1F, z + 1F);
     }
 }

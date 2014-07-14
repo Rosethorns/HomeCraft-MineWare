@@ -1,6 +1,9 @@
 package hcmw.common.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 
 public class TileEntityMultiBlock extends TileEntityBase {
 
@@ -33,10 +36,32 @@ public class TileEntityMultiBlock extends TileEntityBase {
         nbtTagCompound.setBoolean("isParent", this.isParent);
     }
 
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+        this.readFromNBT(pkt.func_148857_g());
+        this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound tag = new NBTTagCompound();
+        this.writeToNBT(tag);
+        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
+    }
+
+    /**
+     * Sets this TE as a parent
+     */
     public void setIsParent() {
         this.isParent = true;
     }
 
+    /**
+     * Sets the parent for this TE
+     * @param parentX The parent x co-ord
+     * @param parentY The parent y co-ord
+     * @param parentZ The parent z co-ord
+     */
     public void setParent(int parentX, int parentY, int parentZ) {
         this.parentX = parentX;
         this.parentY = parentY;
@@ -46,6 +71,10 @@ public class TileEntityMultiBlock extends TileEntityBase {
         this.isParent = false;
     }
 
+    /**
+     * Sets the parent for this TE
+     * @param tileEntity The parent TE
+     */
     public void setParent(TileEntityMultiBlock tileEntity) {
         setParent(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
     }
