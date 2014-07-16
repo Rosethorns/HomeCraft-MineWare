@@ -23,7 +23,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
     //TODO remove this default implementation
     //TODO should we store bed data per tile entity or create a new block for each one
     /**
-     * This is the dimensions for the structure from the bottom-left-back block facing where it is placed. The coords
+     * This is the dimensions for the structure from the bottom-left-front block facing where it is placed. The coords
      * will be refered as such based on its facing.
      * First is x co-ord is width from the parent block to the right
      * Second is y which is height
