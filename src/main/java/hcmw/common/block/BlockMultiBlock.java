@@ -317,13 +317,12 @@ public abstract class BlockMultiBlock extends BlockContainer {
         return AxisAlignedBB.getBoundingBox(x, y, z, x + 1F, y + 1F, z + 1F);
     }
 
-    //TODO test properly with different directions and more collision boxes
+    //TODO test properly with different directions and more collision boxes. This really needs testing with more models.
     @Override
     @SuppressWarnings("unchecked")
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List boundingBoxList, Entity entityColliding) {
         TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
         int facing = world.getBlockMetadata(x, y, z);
-        float[] boundingBoxMax = this.boundingBoxMax;
 
         if (tileEntity != null) {
             //Set the origin points to the parent
@@ -331,26 +330,6 @@ public abstract class BlockMultiBlock extends BlockContainer {
                 x = tileEntity.parentX;
                 y = tileEntity.parentY;
                 z = tileEntity.parentZ;
-                if (world.getBlock(x, y, z) instanceof BlockMultiBlock) boundingBoxMax = ((BlockMultiBlock) world.getBlock(x, y, z)).boundingBoxMax;
-            }
-        }
-        //Offset as needed. Do this outside the loop
-        switch (facing) {
-            //South
-            case 0: {
-                x -= (boundingBoxMax[0] - 1);
-                break;
-            }
-            //West
-            case 1: {
-                x -= (boundingBoxMax[2] - 1);
-                z -= (boundingBoxMax[0] - 1);
-                break;
-            }
-            //North
-            case 2: {
-                z -= boundingBoxMax[2] - 1;
-                break;
             }
         }
         //Loop through and add the collision boxes
@@ -360,18 +339,18 @@ public abstract class BlockMultiBlock extends BlockContainer {
                 switch (ForgeDirection.getOrientation(facing)) {
                     //South
                     case SOUTH: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z + coords[2], x + coords[3], y + coords[4], z + coords[5]);
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0] - 1, y + coords[1], z + coords[2], x + coords[3] - 1, y + coords[4], z + coords[5]);
                         break;
                     }
                     //West
                     case WEST: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                        //TODO headboard is still on wrong side
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2] - 1, y + coords[1], z + coords[0] - 1, x + coords[5] - 1, y + coords[4], z + coords[3] - 1);
                         break;
                     }
                     //North
                     case NORTH: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z + coords[2], x + coords[3], y + coords[4], z + coords[5]);
-                        //axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z + coords[2], x + coords[3], y + coords[4], z + coords[5]);
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z - coords[5] + 1, x + coords[3], y + coords[4], z - coords[2] + 1);
                         break;
                     }
                     //East
