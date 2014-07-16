@@ -114,12 +114,12 @@ public class BlockBedBase extends BlockMultiBlock {
     }
 
     public void setOccupied(World world, int x, int y, int z, boolean bool) {
-        int l = world.getBlockMetadata(x, y, z);
+/*        int l = world.getBlockMetadata(x, y, z);
 
         if (bool) l |= 4;
         else l &= -5;
 
-        world.setBlockMetadataWithNotify(x, y, z, l, 4);
+        world.setBlockMetadataWithNotify(x, y, z, l, 4);*/
     }
 
     @Override

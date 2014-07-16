@@ -9,10 +9,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +23,6 @@ import java.util.List;
 //TODO less loops plz
 public abstract class BlockMultiBlock extends BlockContainer {
 
-    //TODO remove this default implementation
     //TODO should we store bed data per tile entity or create a new block for each one
     /**
      * This is the dimensions for the structure from the bottom-left-front block facing where it is placed. The coords
@@ -139,9 +141,9 @@ public abstract class BlockMultiBlock extends BlockContainer {
             boundingBoxMax = parentBlock.boundingBoxMax;
         }
         //Check if we can place the bed within the bounds defined by the bounding box. I don't like how this looks :(
-        switch (facing) {
+        switch (ForgeDirection.getOrientation(facing)) {
             //South
-            case 0: {
+            case SOUTH: {
                 for (int checkX = x; checkX > x - boundingBoxMax[0]; checkX--) {
                     for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
                         for (int checkZ = z; checkZ < z + boundingBoxMax[2]; checkZ++) {
@@ -152,7 +154,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
                 break;
             }
             //West
-            case 1: {
+            case WEST: {
                 for (int checkX = x; checkX > x - boundingBoxMax[2]; checkX--) {
                     for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
                         for (int checkZ = z; checkZ > z - boundingBoxMax[0]; checkZ--) {
@@ -163,7 +165,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
                 break;
             }
             //North
-            case 2: {
+            case NORTH: {
                 for (int checkX = x; checkX < x + boundingBoxMax[0]; checkX++) {
                     for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
                         for (int checkZ = z; checkZ > z - boundingBoxMax[2]; checkZ--) {
@@ -174,7 +176,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
                 break;
             }
             //East
-            case 3: {
+            case EAST: {
                 for (int checkX = x; checkX < x + boundingBoxMax[2]; checkX++) {
                     for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
                         for (int checkZ = z; checkZ < z + boundingBoxMax[0]; checkZ++) {
@@ -293,21 +295,21 @@ public abstract class BlockMultiBlock extends BlockContainer {
                 z = tileEntity.parentZ;
                 if (world.getBlock(x, y, z) instanceof BlockMultiBlock) boundingBoxMax = ((BlockMultiBlock) world.getBlock(x, y, z)).boundingBoxMax;
             }
-            switch (facing) {
+            switch (ForgeDirection.getOrientation(facing)) {
                 //South
-                case 0: {
+                case SOUTH: {
                     return AxisAlignedBB.getBoundingBox(x - 1, y, z, x + boundingBoxMax[0] - 1, y + boundingBoxMax[1], z + boundingBoxMax[2]);
                 }
                 //West
-                case 1: {
+                case WEST: {
                     return AxisAlignedBB.getBoundingBox(x + 1, y, z - 1, x - boundingBoxMax[2] + 1, y + boundingBoxMax[1], z + boundingBoxMax[0] - 1);
                 }
                 //North
-                case 2: {
+                case NORTH: {
                     return AxisAlignedBB.getBoundingBox(x, y, z + 1, x + boundingBoxMax[0], y + boundingBoxMax[1], z - boundingBoxMax[2] + 1);
                 }
                 //East
-                case 3: {
+                case EAST: {
                     return AxisAlignedBB.getBoundingBox(x, y, z, x + boundingBoxMax[2], y + boundingBoxMax[1], z + boundingBoxMax[0]);
                 }
             }
@@ -354,11 +356,40 @@ public abstract class BlockMultiBlock extends BlockContainer {
         //Loop through and add the collision boxes
         for (float[] coords : this.collisionBoxes) {
             if (coords.length == 6) {
-                AxisAlignedBB axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                AxisAlignedBB axisAlignedBB = null;
+                switch (ForgeDirection.getOrientation(facing)) {
+                    //South
+                    case SOUTH: {
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z + coords[2], x + coords[3], y + coords[4], z + coords[5]);
+                        break;
+                    }
+                    //West
+                    case WEST: {
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                        break;
+                    }
+                    //North
+                    case NORTH: {
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z + coords[2], x + coords[3], y + coords[4], z + coords[5]);
+                        //axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z + coords[2], x + coords[3], y + coords[4], z + coords[5]);
+                        break;
+                    }
+                    //East
+                    case EAST: {
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                        break;
+                    }
+                }
+                //axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
                 if (axisAlignedBB != null && aabb.intersectsWith(axisAlignedBB)) {
                     boundingBoxList.add(axisAlignedBB);
                 }
             }
         }
+    }
+
+    public static int determineOrientation(EntityLivingBase entity) {
+        int dir = MathHelper.floor_double((double) (entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        return dir == 0 ? 3 : (dir == 1 ? 4 : (dir == 2 ? 2 : (dir == 3 ? 5 : 0)));
     }
 }
