@@ -46,18 +46,6 @@ public class BlockBounding extends BlockMultiBlock {
         return false;
     }
 
-    //TODO Allow for multiple boxes so players can stand on the bed?
-    /*    @Override
-    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB par5AxisAlignedBB, List list, Entity entity) {
-        if (this.boundingBoxMax != null && this.boundingBoxMax.length == 6) {
-            this.setBlockBounds(this.boundingBoxMax[0], this.boundingBoxMax[1], this.boundingBoxMax[2], this.boundingBoxMax[3], this.boundingBoxMax[4], this.boundingBoxMax[5]);
-        }
-        else {
-            this.setBlockBounds(0F, 0F, 0F, 1F, 1F, 1F);
-        }
-        super.addCollisionBoxesToList(world, x, y, z, par5AxisAlignedBB, list, entity);
-    }*/
-
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float p_149727_7_, float p_149727_8_, float p_149727_9_) {
         TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);

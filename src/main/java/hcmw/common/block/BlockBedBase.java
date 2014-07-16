@@ -32,6 +32,7 @@ public class BlockBedBase extends BlockMultiBlock {
     public BlockBedBase() {
         super(Material.wood);
         setCreativeTab(HCMW.tabHCMW);
+        this.boundingBoxMax = new float[]{2F, 3F, 2F};
     }
 
     @Override
@@ -64,8 +65,6 @@ public class BlockBedBase extends BlockMultiBlock {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_) {
         if (world.isRemote) return true;
         else {
-            int metadata = world.getBlockMetadata(x, y, z);
-
             if (world.provider.canRespawnHere() && world.getBiomeGenForCoords(x, z) != BiomeGenBase.hell) {
                 //Check if another player is sleeping in this bed
                 EntityPlayer entityplayer1 = null;

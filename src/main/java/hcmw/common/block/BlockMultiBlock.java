@@ -8,22 +8,38 @@ import hcmw.common.tileentity.TileEntityMultiBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
+
+//TODO less loops plz
 public abstract class BlockMultiBlock extends BlockContainer {
 
+    //TODO remove this default implementation
     //TODO should we store bed data per tile entity or create a new block for each one
     /**
-     * This is the dimensions for the structure from the bottom-left-front block facing where it is placed. The coords
+     * This is the dimensions for the structure from the bottom-left-back block facing where it is placed. The coords
      * will be refered as such based on its facing.
      * First is x co-ord is width from the parent block to the right
      * Second is y which is height
      * Third is z which is depth from the parent block to the right
      */
-    protected float[] boundingBoxMax = new float[]{2F, 3F, 2F};
+    protected float[] boundingBoxMax = new float[3];
+
+    //TODO remove this default implementation
+    protected List<float[]> collisionBoxes = new ArrayList<float[]>() {{
+        add(new float[]{0, 0, 0, 0.1875F, 3, 0.1875F}); //Left front post
+        add(new float[]{1.8125F, 0, 0, 2, 3, 0.1875F}); //Right front post
+        add(new float[]{1.8125F, 0, 1.8125F, 2, 3, 2}); //Right back post
+        add(new float[]{0, 0, 1.8125F, 0.1875F, 3, 2}); //Left back post
+        add(new float[]{0, 0, 0, 2, 0.8125F, 2}); //Bed
+        add(new float[]{0, 0, 1.625F, 2, 2, 2}); //Backboard
+    }};
 
     protected BlockMultiBlock(Material material) {
         super(material);
@@ -117,6 +133,11 @@ public abstract class BlockMultiBlock extends BlockContainer {
      * @return What the task returns
      */
     private boolean multiBlockLoop(World world, int x, int y, int z, int facing, int taskID) {
+        float[] boundingBoxMax = this.boundingBoxMax;
+        if (world.getBlock(x, y, z) instanceof BlockMultiBlock) {
+            BlockMultiBlock parentBlock = (BlockMultiBlock) world.getBlock(x, y, z);
+            boundingBoxMax = parentBlock.boundingBoxMax;
+        }
         //Check if we can place the bed within the bounds defined by the bounding box. I don't like how this looks :(
         switch (facing) {
             //South
@@ -249,6 +270,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
         TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
 
         if (tileEntity != null) {
+            //We want to return the parent item, not this
             if (tileEntity.isParent) return Item.getItemFromBlock(this);
             else {
                 return Item.getItemFromBlock(world.getBlock(tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ));
@@ -257,20 +279,86 @@ public abstract class BlockMultiBlock extends BlockContainer {
         else return null;
     }
 
-    //TODO Make this work with all angles. Currently only works for east direction
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
         TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
-        if (this.boundingBoxMax != null && this.boundingBoxMax.length == 3 && tileEntity != null) {
+        float[] boundingBoxMax = this.boundingBoxMax;
+        int facing = world.getBlockMetadata(x, y, z);
+
+        if (tileEntity != null) {
             if (!tileEntity.isParent) {
-                return AxisAlignedBB.getBoundingBox(tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ,
-                        tileEntity.parentX + this.boundingBoxMax[0], tileEntity.parentY + this.boundingBoxMax[1], tileEntity.parentZ + this.boundingBoxMax[2]);
+                x = tileEntity.parentX;
+                y = tileEntity.parentY;
+                z = tileEntity.parentZ;
+                if (world.getBlock(x, y, z) instanceof BlockMultiBlock) boundingBoxMax = ((BlockMultiBlock) world.getBlock(x, y, z)).boundingBoxMax;
             }
-            else {
-                return AxisAlignedBB.getBoundingBox(x, y, z, x + this.boundingBoxMax[0], y + this.boundingBoxMax[1], z + this.boundingBoxMax[2]);
+            switch (facing) {
+                //South
+                case 0: {
+                    return AxisAlignedBB.getBoundingBox(x - 1, y, z, x + boundingBoxMax[0] - 1, y + boundingBoxMax[1], z + boundingBoxMax[2]);
+                }
+                //West
+                case 1: {
+                    return AxisAlignedBB.getBoundingBox(x + 1, y, z - 1, x - boundingBoxMax[2] + 1, y + boundingBoxMax[1], z + boundingBoxMax[0] - 1);
+                }
+                //North
+                case 2: {
+                    return AxisAlignedBB.getBoundingBox(x, y, z + 1, x + boundingBoxMax[0], y + boundingBoxMax[1], z - boundingBoxMax[2] + 1);
+                }
+                //East
+                case 3: {
+                    return AxisAlignedBB.getBoundingBox(x, y, z, x + boundingBoxMax[2], y + boundingBoxMax[1], z + boundingBoxMax[0]);
+                }
             }
         }
-        else return AxisAlignedBB.getBoundingBox(x, y, z, x + 1F, y + 1F, z + 1F);
+        return AxisAlignedBB.getBoundingBox(x, y, z, x + 1F, y + 1F, z + 1F);
+    }
+
+    //TODO test properly with different directions and more collision boxes
+    @Override
+    @SuppressWarnings("unchecked")
+    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List boundingBoxList, Entity entityColliding) {
+        TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
+        int facing = world.getBlockMetadata(x, y, z);
+        float[] boundingBoxMax = this.boundingBoxMax;
+
+        if (tileEntity != null) {
+            //Set the origin points to the parent
+            if (!tileEntity.isParent) {
+                x = tileEntity.parentX;
+                y = tileEntity.parentY;
+                z = tileEntity.parentZ;
+                if (world.getBlock(x, y, z) instanceof BlockMultiBlock) boundingBoxMax = ((BlockMultiBlock) world.getBlock(x, y, z)).boundingBoxMax;
+            }
+        }
+        //Offset as needed. Do this outside the loop
+        switch (facing) {
+            //South
+            case 0: {
+                x -= (boundingBoxMax[0] - 1);
+                break;
+            }
+            //West
+            case 1: {
+                x -= (boundingBoxMax[2] - 1);
+                z -= (boundingBoxMax[0] - 1);
+                break;
+            }
+            //North
+            case 2: {
+                z -= boundingBoxMax[2] - 1;
+                break;
+            }
+        }
+        //Loop through and add the collision boxes
+        for (float[] coords : this.collisionBoxes) {
+            if (coords.length == 6) {
+                AxisAlignedBB axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                if (axisAlignedBB != null && aabb.intersectsWith(axisAlignedBB)) {
+                    boundingBoxList.add(axisAlignedBB);
+                }
+            }
+        }
     }
 }
