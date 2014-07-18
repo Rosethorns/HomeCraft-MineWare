@@ -18,3 +18,6 @@
 /.classpath
 /.project
 /bin
+
+##Allow obj files. I have no idea why it ignores them by default but yeah
+!*.obj

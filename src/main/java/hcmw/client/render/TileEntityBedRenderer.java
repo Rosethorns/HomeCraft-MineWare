@@ -29,7 +29,7 @@ public class TileEntityBedRenderer extends TileEntitySpecialRenderer {
     private int displayListID = 0;
 
     public TileEntityBedRenderer() {
-        this.bedModel = (WavefrontObject) AdvancedModelLoader.loadModel(new ResourceLocation("rorax:PBed.obj"));
+        this.bedModel = (WavefrontObject) AdvancedModelLoader.loadModel(new ResourceLocation("rorax:pbed.obj"));
     }
 
     @Override
