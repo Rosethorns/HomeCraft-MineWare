@@ -34,13 +34,13 @@ public abstract class BlockMultiBlock extends BlockContainer {
     protected float[] boundingBoxMax = new float[3];
 
     //TODO remove this default implementation
-    protected List<float[]> collisionBoxes = new ArrayList<float[]>() {{
+    public final List<float[]> collisionBoxes = new ArrayList<float[]>() {{
         add(new float[]{0, 0, 0, 0.1875F, 3, 0.1875F}); //Left front post
         add(new float[]{1.8125F, 0, 0, 2, 3, 0.1875F}); //Right front post
         add(new float[]{1.8125F, 0, 1.8125F, 2, 3, 2}); //Right back post
         add(new float[]{0, 0, 1.8125F, 0.1875F, 3, 2}); //Left back post
         add(new float[]{0, 0, 0, 2, 0.8125F, 2}); //Bed
-        add(new float[]{0, 0, 1.625F, 2, 2, 2}); //Backboard
+        add(new float[]{0, 0, 1.8125F, 2, 1.5F, 2}); //Backboard
     }};
 
     protected BlockMultiBlock(Material material) {

@@ -33,7 +33,7 @@ public class TileEntityBedRenderer extends TileEntitySpecialRenderer {
     }
 
     @Override
-    public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float p_147500_8_) {
+    public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float partialTick) {
         //ID is 0 if unset or it failed to create to create list
         if (this.displayListID == 0) {
             this.displayListID = GLAllocation.generateDisplayLists(1);
