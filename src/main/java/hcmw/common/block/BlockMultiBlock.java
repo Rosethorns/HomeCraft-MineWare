@@ -34,13 +34,23 @@ public abstract class BlockMultiBlock extends BlockContainer {
     protected float[] boundingBoxMax = new float[3];
 
     //TODO remove this default implementation
-    public final List<float[]> collisionBoxes = new ArrayList<float[]>() {{
+    /**
+     * A list of collision box co-ordinates used by this block that are an array of floats.
+     * Position is relative to the block so 0, 0, 0 is the bottom, left, front corner
+     * First index is min x (width)
+     * Second index is min y (height)
+     * Third index is min z (depth)
+     * Forth index is max x (width)
+     * Fifth index is max y (height)
+     * Sixth index is max z (depth)
+     */
+    public List<float[]> collisionBoxes = new ArrayList<float[]>() {{
         add(new float[]{0, 0, 0, 0.1875F, 3, 0.1875F}); //Left front post
         add(new float[]{1.8125F, 0, 0, 2, 3, 0.1875F}); //Right front post
         add(new float[]{1.8125F, 0, 1.8125F, 2, 3, 2}); //Right back post
         add(new float[]{0, 0, 1.8125F, 0.1875F, 3, 2}); //Left back post
         add(new float[]{0, 0, 0, 2, 0.8125F, 2}); //Bed
-        add(new float[]{0, 0, 1.8125F, 2, 1.5F, 2}); //Backboard
+        add(new float[]{0, 0, 1.8125F, 2F, 1.5F, 2F}); //Backboard
     }};
 
     protected BlockMultiBlock(Material material) {
@@ -336,6 +346,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
         for (float[] coords : this.collisionBoxes) {
             if (coords.length == 6) {
                 AxisAlignedBB axisAlignedBB = null;
+                //TODO test this code on other sized structures
                 switch (ForgeDirection.getOrientation(facing)) {
                     //South
                     case SOUTH: {
@@ -344,8 +355,7 @@ public abstract class BlockMultiBlock extends BlockContainer {
                     }
                     //West
                     case WEST: {
-                        //TODO headboard is still on wrong side
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2] - 1, y + coords[1], z + coords[0] - 1, x + coords[5] - 1, y + coords[4], z + coords[3] - 1);
+                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x - coords[5] + 1, y + coords[1], z + coords[0] - 1, x - coords[2] + 1, y + coords[4], z + coords[3] - 1);
                         break;
                     }
                     //North
