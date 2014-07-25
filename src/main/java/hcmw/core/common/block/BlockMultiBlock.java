@@ -1,10 +1,12 @@
 package hcmw.core.common.block;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import hcmw.HCMWCore;
 import hcmw.core.common.tileentity.TileEntityBounding;
 import hcmw.core.common.tileentity.TileEntityMultiBlock;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -16,9 +18,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import java.util.ArrayList;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 //TODO less loops plz
 public abstract class BlockMultiBlock extends BlockContainer implements IDirectional {
@@ -150,58 +151,51 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
             BlockMultiBlock parentBlock = (BlockMultiBlock) world.getBlock(x, y, z);
             boundingBoxMax = parentBlock.boundingBoxMax;
         }
-        //Check if we can place the bed within the bounds defined by the bounding box. I don't like how this looks :(
-        switch (ForgeDirection.getOrientation(facing)) {
-            //South
-            case SOUTH: {
-                for (int checkX = x; checkX > x - boundingBoxMax[0]; checkX--) {
-                    for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                        for (int checkZ = z; checkZ < z + boundingBoxMax[2]; checkZ++) {
-                            if (!doTask(world, x, y, z, facing, checkX, checkY, checkZ, taskID)) return false;
-                        }
-                    }
-                }
+        
+        ForgeDirection dir = ForgeDirection.getOrientation(facing);
+        
+        int xSize = (int) ((boundingBoxMax[0] * dir.offsetX) + (boundingBoxMax[2] * dir.offsetZ));
+        int ySize = (int) boundingBoxMax[1];
+        int zSize = (int) ((boundingBoxMax[2] * dir.offsetX) + (boundingBoxMax[0] * dir.offsetZ));
+        xSize = (xSize < 0 ? -xSize : xSize);
+        zSize = (zSize < 0 ? -zSize : zSize);
+        
+        int xOffset;
+        int zOffset;
+        
+        switch (dir) {
+            case NORTH:
+                xOffset = 0;
+                zOffset = -zSize + 1;
                 break;
-            }
-            //West
-            case WEST: {
-                for (int checkX = x; checkX > x - boundingBoxMax[2]; checkX--) {
-                    for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                        for (int checkZ = z; checkZ > z - boundingBoxMax[0]; checkZ--) {
-                            if (!doTask(world, x, y, z, facing, checkX, checkY, checkZ, taskID)) return false;
-                        }
-                    }
-                }
+            case SOUTH:
+                xOffset = -xSize + 1;
+                zOffset = 0;
                 break;
-            }
-            //North
-            case NORTH: {
-                for (int checkX = x; checkX < x + boundingBoxMax[0]; checkX++) {
-                    for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                        for (int checkZ = z; checkZ > z - boundingBoxMax[2]; checkZ--) {
-                            if (!doTask(world, x, y, z, facing, checkX, checkY, checkZ, taskID)) return false;
-                        }
-                    }
-                }
+            case WEST:
+                zOffset = -zSize + 1;
+                xOffset = -xSize + 1;
                 break;
-            }
-            //East
-            case EAST: {
-                for (int checkX = x; checkX < x + boundingBoxMax[2]; checkX++) {
-                    for (int checkY = y; checkY < y + boundingBoxMax[1]; checkY++) {
-                        for (int checkZ = z; checkZ < z + boundingBoxMax[0]; checkZ++) {
-                            if (!doTask(world, x, y, z, facing, checkX, checkY, checkZ, taskID)) {
-                                return false;
-                            }
-                        }
-                    }
-                }
+            case EAST:
+                xOffset = 0;
+                zOffset = 0;
                 break;
+            default:
+                HCMWCore.logger.warn("Multi-block at X:" + x + " Y:" + y + " Z:" + z + " has invalid rotation " + dir.name() + ".");
+                return false;
+        }
+        
+        for (int checkX = x + xOffset; checkX < x + xSize + xOffset; checkX++) {
+            for (int checkY = y; checkY < y + ySize; checkY++) {
+                for (int checkZ = z + zOffset; checkZ < z + zSize + zOffset; checkZ++) {
+                    if (!doTask(world, x, y, z, facing, checkX, checkY, checkZ, taskID)) return false;
+                }
             }
         }
+        
         return true;
     }
-
+    
     /**
      * Does the various tasks for {@link #multiBlockLoop(net.minecraft.world.World, int, int, int, int, int)}
      * @param world The world
