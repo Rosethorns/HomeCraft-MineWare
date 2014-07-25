@@ -1,6 +1,6 @@
-package hcmw.client.render;
+package hcmw.core.client.render;
 
-import hcmw.common.block.IDirectional;
+import hcmw.core.common.block.IDirectional;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;

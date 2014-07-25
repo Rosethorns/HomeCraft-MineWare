@@ -1,4 +1,4 @@
-package hcmw.client.render;
+package hcmw.core.client.render;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;

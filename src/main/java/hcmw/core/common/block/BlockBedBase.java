@@ -1,21 +1,6 @@
-/*
- * Copyright (C) 2014  Kihira
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
+package hcmw.core.common.block;
 
-package hcmw.common.block;
-
-import hcmw.common.HCMW;
-import hcmw.common.tileentity.TileEntityBed;
+import hcmw.core.common.tileentity.TileEntityBed;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -31,7 +16,6 @@ public class BlockBedBase extends BlockMultiBlock {
 
     public BlockBedBase() {
         super(Material.wood);
-        setCreativeTab(HCMW.tabHCMW);
         this.boundingBoxMax = new float[]{2F, 3F, 2F};
     }
 

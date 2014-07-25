@@ -1,10 +1,10 @@
-package hcmw.common.block;
+package hcmw.core.common.block;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hcmw.common.HCMW;
-import hcmw.common.tileentity.TileEntityBounding;
-import hcmw.common.tileentity.TileEntityMultiBlock;
+import hcmw.HCMWCore;
+import hcmw.core.common.tileentity.TileEntityBounding;
+import hcmw.core.common.tileentity.TileEntityMultiBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -69,7 +69,7 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
                 if (!this.isStructureValid(world, tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ, tileEntity.getBlockMetadata())) {
                     //Destroy structure
                     if (!this.destroyStructure(world, tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ, tileEntity.getBlockMetadata())) {
-                        HCMW.logger.warn("Failed to properly delete mutliblock structure, this is very bad!");
+                        HCMWCore.logger.warn("Failed to properly delete mutliblock structure, this is very bad!");
                     }
                 }
             }
@@ -270,7 +270,7 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
      */
     private void setBoundingBlock(World world, int parentX, int parentY, int parentZ, int parentMeta, int posX, int posY, int posZ) {
         //Set the block and verify. Use flag 2 here and we don't want to trigger a block update
-        if (world.setBlock(posX, posY, posZ, HCMW.blockBounding, parentMeta, 2)) {
+        if (world.setBlock(posX, posY, posZ, HCMWCore.blockBounding, parentMeta, 2)) {
             TileEntityBounding tileEntityBounding = (TileEntityBounding) world.getTileEntity(posX, posY, posZ);
             tileEntityBounding.setParent(parentX, parentY, parentZ);
         }

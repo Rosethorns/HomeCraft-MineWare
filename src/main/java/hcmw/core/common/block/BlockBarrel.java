@@ -1,6 +1,6 @@
-package hcmw.common.block;
+package hcmw.core.common.block;
 
-import hcmw.common.tileentity.TileEntityBarrel;
+import hcmw.core.common.tileentity.TileEntityBarrel;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -46,7 +46,6 @@ public class BlockBarrel extends BlockContainer implements IDirectional {
         int dir = BlockMultiBlock.determineForgeOrientation(entity);
         int onWall = world.getBlockMetadata(x, y, z) & 8;
         world.setBlockMetadataWithNotify(x, y, z, dir | onWall, 2);
-        System.out.println(dir | onWall);
     }
 
     @Override

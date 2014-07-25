@@ -1,6 +1,6 @@
-package hcmw.common.item;
+package hcmw.core.common.item;
 
-import hcmw.common.block.BlockMultiBlock;
+import hcmw.core.common.block.BlockMultiBlock;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;

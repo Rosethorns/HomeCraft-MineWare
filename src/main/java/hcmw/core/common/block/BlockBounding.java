@@ -1,7 +1,7 @@
-package hcmw.common.block;
+package hcmw.core.common.block;
 
-import hcmw.common.tileentity.TileEntityBounding;
-import hcmw.common.tileentity.TileEntityMultiBlock;
+import hcmw.core.common.tileentity.TileEntityBounding;
+import hcmw.core.common.tileentity.TileEntityMultiBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;

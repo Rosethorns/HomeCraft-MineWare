@@ -1,14 +1,32 @@
-[{
-    "modid": "PlayerBeacons",
-    "name": "Player Beacons",
-    "description": "Tap into the power of the end to enhance yourself",
+[
+{
+    "modid": "hcmw|core",
+    "name": "HomeCraft MineWare",
+    "description": "Core",
     "version": "${version}",
     "mcversion": "${mcversion}",
-    "url": "http://kihirakreations.co.uk/",
-    "updateUrl": "http://kihirakreations.co.uk/",
-    "authors": [ "Kihira", "Nexans20" ],
-    "credits": "Code by Kihira, Textures by Nexans",
+    "url": "",
+    "updateUrl": "",
+    "authors": [ "Kihira", "Rorax" ],
+    "credits": "",
     "logoFile": "",
     "screenshots": [ ],
     "dependencies": [  ]
-}]
+}
+]
+[
+{
+    "modid": "hcmw|medieval",
+    "name": "HomeCraft MineWare - Medieval",
+    "description": "Medieval module",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authors": [ "Kihira", "Rorax" ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [ ],
+    "dependencies": [  ]
+}
+]

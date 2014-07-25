@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-package hcmw.common.tileentity;
+package hcmw.core.common.tileentity;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

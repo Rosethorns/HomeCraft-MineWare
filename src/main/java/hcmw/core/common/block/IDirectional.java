@@ -1,4 +1,4 @@
-package hcmw.common.block;
+package hcmw.core.common.block;
 
 import net.minecraft.world.World;
 

@@ -1,4 +1,4 @@
-package hcmw.common.tileentity;
+package hcmw.core.common.tileentity;
 
 /**
  * A basic bounding tile entity that passes on most calls to it's parent instead

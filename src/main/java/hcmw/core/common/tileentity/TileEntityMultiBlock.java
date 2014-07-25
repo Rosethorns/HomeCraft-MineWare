@@ -1,4 +1,4 @@
-package hcmw.common.tileentity;
+package hcmw.core.common.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
