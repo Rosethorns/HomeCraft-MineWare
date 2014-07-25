@@ -18,9 +18,11 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import hcmw.common.block.BlockBarrel;
 import hcmw.common.block.BlockBedBase;
 import hcmw.common.block.BlockBounding;
-import hcmw.common.item.ItemMultiBlock;
+import hcmw.common.item.ItemBlockMulti;
+import hcmw.common.tileentity.TileEntityBarrel;
 import hcmw.common.tileentity.TileEntityBase;
 import hcmw.common.tileentity.TileEntityBed;
 import hcmw.common.tileentity.TileEntityBounding;
@@ -43,20 +45,24 @@ public class HCMW {
             return Items.bed;
         }
     };
+
     public static final Block blockBed = new BlockBedBase().setBlockName("blockTestBed");
     public static final Block blockBounding = new BlockBounding().setBlockName("boundingBlock");
+    public static final Block blockBarrel = new BlockBarrel().setBlockName("barrelBlock").setCreativeTab(tabHCMW);
 
     @SidedProxy(serverSide = "hcmw.proxy.ProxyCommon", clientSide = "hcmw.proxy.ProxyClient")
     public static ProxyCommon proxy;
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent e) {
-        GameRegistry.registerBlock(blockBed, ItemMultiBlock.class, "blockBedTest");
+        GameRegistry.registerBlock(blockBed, ItemBlockMulti.class, "blockBedTest");
         GameRegistry.registerBlock(blockBounding, "blockBounding");
+        GameRegistry.registerBlock(blockBarrel, "blockBarrel");
 
         GameRegistry.registerTileEntity(TileEntityBase.class, HCMW.MOD_ID + ":base");
         GameRegistry.registerTileEntity(TileEntityBed.class, HCMW.MOD_ID + ":bed");
         GameRegistry.registerTileEntity(TileEntityBounding.class, HCMW.MOD_ID + ":bounding");
+        GameRegistry.registerTileEntity(TileEntityBarrel.class, HCMW.MOD_ID + ":barrel");
 
         proxy.registerRenderers();
     }

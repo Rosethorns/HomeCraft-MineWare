@@ -150,4 +150,9 @@ public class BlockBedBase extends BlockMultiBlock {
     public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityBed();
     }
+
+    @Override
+    public int getDirectionOppositeFacing(World world, int x, int y, int z) {
+        return world.getBlockMetadata(x, y, z);
+    }
 }

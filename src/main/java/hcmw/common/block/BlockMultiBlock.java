@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO less loops plz
-public abstract class BlockMultiBlock extends BlockContainer {
+public abstract class BlockMultiBlock extends BlockContainer implements IDirectional {
 
     //TODO should we store bed data per tile entity or create a new block for each one
     /**
@@ -377,7 +377,12 @@ public abstract class BlockMultiBlock extends BlockContainer {
         }
     }
 
-    public static int determineOrientation(EntityLivingBase entity) {
+    /**
+     * Determines the {@link net.minecraftforge.common.util.ForgeDirection} the entity is facing
+     * @param entity The entity
+     * @return The direction
+     */
+    public static int determineForgeOrientation(EntityLivingBase entity) {
         int dir = MathHelper.floor_double((double) (entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
         return dir == 0 ? 3 : (dir == 1 ? 4 : (dir == 2 ? 2 : (dir == 3 ? 5 : 0)));
     }

@@ -26,7 +26,7 @@ public class TileEntityBase extends TileEntity {
 
     @Override
     public boolean canUpdate() {
-        return true; //This is decoration only, we don't need to tick
+        return false; //This is decoration only, we don't need to tick
     }
 
     @Override
