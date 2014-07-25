@@ -1,19 +1,23 @@
-package hcmw.core.client.render;
+package hcmw.medieval.client.render;
 
-import net.minecraft.tileentity.TileEntity;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import hcmw.core.client.render.TileEntityObjRenderer;
+import hcmw.core.common.tileentity.TileEntityBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
+@SideOnly(Side.CLIENT)
 public class TileEntityBarrelRenderer extends TileEntityObjRenderer {
 
-    public TileEntityBarrelRenderer(ResourceLocation modelLoc, ResourceLocation textureLoc) {
-        super(modelLoc, textureLoc);
+    public TileEntityBarrelRenderer(ResourceLocation texLoc, ResourceLocation model) {
+        super(texLoc, model);
     }
 
     @Override
-    public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float partialTick) {
-        this.checkDisplayList();
+    public void renderTileEntityAt(TileEntityBase tileEntity, double x, double y, double z, float partialTick) {
+        super.checkDisplayList();
 
         if (tileEntity != null) {
             int meta = tileEntity.getWorldObj().getBlockMetadata(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
@@ -21,7 +25,6 @@ public class TileEntityBarrelRenderer extends TileEntityObjRenderer {
             if (meta < 8) super.renderTileEntityAt(tileEntity, x, y, z, partialTick);
             else {
                 GL11.glPushMatrix();
-                GL11.glDisable(GL11.GL_CULL_FACE);
                 //Model is off by -one in z
                 switch (ForgeDirection.getOrientation(meta - 8)) {
                     //South
@@ -58,8 +61,7 @@ public class TileEntityBarrelRenderer extends TileEntityObjRenderer {
                         GL11.glTranslated(x, y, z + 1);
                     }
                 }
-                GL11.glCallList(this.displayListID);
-                GL11.glEnable(GL11.GL_CULL_FACE);
+                GL11.glCallList(displayListID);
                 GL11.glPopMatrix();
             }
         }

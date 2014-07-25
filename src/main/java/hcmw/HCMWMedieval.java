@@ -4,10 +4,9 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
-import hcmw.core.common.block.BlockBarrel;
 import hcmw.core.common.block.BlockBedBase;
 import hcmw.core.common.item.ItemBlockMulti;
-import hcmw.core.common.tileentity.TileEntityBarrel;
+import hcmw.medieval.common.block.BlockBarrel;
 import hcmw.medieval.proxy.ProxyCommon;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -31,14 +30,13 @@ public class HCMWMedieval {
     public static ProxyCommon proxy;
 
     public static final Block blockBed = new BlockBedBase().setBlockName("blockPosterBed").setCreativeTab(tabHCMWMedieval);
-    public static final Block blockBarrelItems = new BlockBarrel().setBlockName("blockBarrelItems").setCreativeTab(tabHCMWMedieval);
+    public static final Block blockBarrelInventory = new BlockBarrel.BlockBarrelInventory().setBlockName("blockBarrelInventory").setCreativeTab(tabHCMWMedieval);
+    //public static final Block blockBarrelFluid = new BlockBarrel.BlockBarrelFluid().setBlockName("blockBarrelFluid").setCreativeTab(tabHCMWMedieval);
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent e) {
         GameRegistry.registerBlock(blockBed, ItemBlockMulti.class, blockBed.getUnlocalizedName());
-        GameRegistry.registerBlock(blockBarrelItems, blockBarrelItems.getUnlocalizedName());
-
-        GameRegistry.registerTileEntity(TileEntityBarrel.class, HCMWMedieval.MOD_ID + ":barrel");
+        GameRegistry.registerBlock(blockBarrelInventory, blockBarrelInventory.getUnlocalizedName());
 
         proxy.registerRenderers();
     }
