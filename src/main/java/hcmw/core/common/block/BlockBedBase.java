@@ -16,7 +16,6 @@ public class BlockBedBase extends BlockMultiBlock {
 
     public BlockBedBase() {
         super(Material.wood);
-        this.boundingBoxMax = new float[]{2F, 3F, 2F};
     }
 
     @Override

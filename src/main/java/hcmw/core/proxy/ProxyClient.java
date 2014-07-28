@@ -22,6 +22,6 @@ public class ProxyClient extends ProxyCommon {
 
     @Override
     public void registerRenderers() {
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBase.class, new TileEntityObjRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBase.class, new TileEntityObjRenderer(null));
     }
 }

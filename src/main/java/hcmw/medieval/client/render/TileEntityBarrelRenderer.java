@@ -2,22 +2,27 @@ package hcmw.medieval.client.render;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import hcmw.core.client.render.RenderInfo;
 import hcmw.core.client.render.TileEntityObjRenderer;
 import hcmw.core.common.tileentity.TileEntityBase;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityBarrelRenderer extends TileEntityObjRenderer {
 
-    public TileEntityBarrelRenderer(ResourceLocation texLoc, ResourceLocation model) {
-        super(texLoc, model);
+    private int displayListID = 0;
+
+    public TileEntityBarrelRenderer(RenderInfo renderInfo) {
+        super(renderInfo);
     }
 
+    //TODO normal barrel rendering is currently broken as the position needs to be fixed. Need model fixed
     @Override
     public void renderTileEntityAt(TileEntityBase tileEntity, double x, double y, double z, float partialTick) {
-        super.checkDisplayList();
+        checkDisplayList();
 
         if (tileEntity != null) {
             int meta = tileEntity.getWorldObj().getBlockMetadata(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
@@ -64,6 +69,18 @@ public class TileEntityBarrelRenderer extends TileEntityObjRenderer {
                 GL11.glCallList(displayListID);
                 GL11.glPopMatrix();
             }
+        }
+    }
+
+    //TODO kinda legacy code? But good for performance. Make a way to pre-cache certain render states?
+    protected void checkDisplayList() {
+        //ID is 0 if unset or it failed to create to create list
+        if (this.displayListID == 0 && this.renderInfo != null) {
+            this.displayListID = GLAllocation.generateDisplayLists(1);
+            GL11.glNewList(this.displayListID, GL11.GL_COMPILE);
+            Minecraft.getMinecraft().renderEngine.bindTexture(this.renderInfo.getResourceLocForPass(0));
+            this.renderInfo.getModel().renderAll();
+            GL11.glEndList();
         }
     }
 }

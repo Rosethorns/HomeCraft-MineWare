@@ -3,34 +3,26 @@ package hcmw.core.client.render;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hcmw.core.common.block.IDirectional;
+import hcmw.core.common.tileentity.ICustomizable;
 import hcmw.core.common.tileentity.TileEntityBase;
 import hcmw.core.proxy.ProxyClient;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
+import java.util.List;
+
 @SideOnly(Side.CLIENT)
+//TODO optimisation anywhere?
 public class TileEntityObjRenderer extends TileEntitySpecialRenderer {
 
-    protected final ResourceLocation texLoc;
-    protected final WavefrontObject model;
-    protected int displayListID = 0;
+    protected final RenderInfo renderInfo;
 
-    public TileEntityObjRenderer() {
-        this.texLoc = null;
-        this.model = null;
-    }
-
-    public TileEntityObjRenderer(ResourceLocation model, ResourceLocation texLoc) {
-        this.texLoc = texLoc;
-        this.model = (WavefrontObject) AdvancedModelLoader.loadModel(model);
+    public TileEntityObjRenderer(RenderInfo renderInfo) {
+        this.renderInfo = renderInfo;
     }
 
     //This should not be overriden! It will pass on the rendering to the mapped TESR
@@ -56,33 +48,26 @@ public class TileEntityObjRenderer extends TileEntitySpecialRenderer {
      * @param partialTick The partial tick
      */
     public void renderTileEntityAt(TileEntityBase tileEntity, double x, double y, double z, float partialTick) {
-        checkDisplayList();
-
         GL11.glPushMatrix();
-        GL11.glDisable(GL11.GL_CULL_FACE);
         Block block = tileEntity.getWorldObj().getBlock(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
         if (block instanceof IDirectional) {
             switch (ForgeDirection.getOrientation(((IDirectional) block).getDirectionOppositeFacing(tileEntity.getWorldObj(), tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord))) {
-                //South
                 case SOUTH: {
-                    GL11.glTranslated(x + 1D, y, z);
+                    GL11.glTranslated(x, y, z + 1);
                     GL11.glRotatef(180F, 0F, 1F, 0F);
                     break;
                 }
-                //West
                 case WEST: {
-                    GL11.glTranslated(x + 1D, y, z + 1D);
+                    GL11.glTranslated(x, y, z);
                     GL11.glRotatef(90F, 0F, 1F, 0F);
                     break;
                 }
-                //North
                 case NORTH: {
-                    GL11.glTranslated(x, y, z + 1D);
+                    GL11.glTranslated(x + 1D, y, z);
                     break;
                 }
-                //East
                 case EAST: {
-                    GL11.glTranslated(x, y, z);
+                    GL11.glTranslated(x + 1, y, z + 1);
                     GL11.glRotatef(90F, 0F, -1F, 0F);
                     break;
                 }
@@ -94,19 +79,37 @@ public class TileEntityObjRenderer extends TileEntitySpecialRenderer {
         else {
             GL11.glTranslated(x, y, z + 1);
         }
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCallList(displayListID);
-        GL11.glPopMatrix();
-    }
 
-    protected void checkDisplayList() {
-        //ID is 0 if unset or it failed to create to create list
-        if (this.displayListID == 0 && model != null) {
-            this.displayListID = GLAllocation.generateDisplayLists(1);
-            GL11.glNewList(this.displayListID, GL11.GL_COMPILE);
-            Minecraft.getMinecraft().renderEngine.bindTexture(this.texLoc);
-            this.model.renderAll();
-            GL11.glEndList();
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        //If model has multiple render passes
+        if (tileEntity instanceof ICustomizable) {
+            ICustomizable multiPartRender = (ICustomizable) tileEntity;
+            //We pass a tesselator so it can all be added to one draw call
+            //Tessellator tessellator = Tessellator.instance;
+            //tessellator.startDrawing(GL11.GL_TRIANGLES);
+            for (int pass = 0; pass < this.renderInfo.getRenderPasses(); pass++) {
+                float[] colour = multiPartRender.getRGBAForPass(pass);
+                GL11.glColor4f(colour[0], colour[1], colour[2], colour[3]);
+                Minecraft.getMinecraft().renderEngine.bindTexture(this.renderInfo.getResourceLocForPass(pass));
+                //TODO not have to convert to array
+                List<String> partsForPass = multiPartRender.getPartsForPass(pass);
+                //this.renderInfo.getModel().tessellateOnly(tessellator, partsForPass.toArray(new String[partsForPass.size()]));
+                this.renderInfo.getModel().renderOnly(partsForPass.toArray(new String[partsForPass.size()]));
+            }
+            //tessellator.draw();
         }
+        else {
+            Minecraft.getMinecraft().renderEngine.bindTexture(this.renderInfo.getResourceLocForPass(0));
+            this.renderInfo.getModel().renderAll();
+        }
+
+        //Reset GL stuff
+        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glPopMatrix();
     }
 }

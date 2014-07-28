@@ -1,12 +1,10 @@
 package hcmw.core.common.block;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hcmw.HCMWCore;
 import hcmw.core.common.tileentity.TileEntityBounding;
 import hcmw.core.common.tileentity.TileEntityMultiBlock;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -18,8 +16,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 //TODO less loops plz
 public abstract class BlockMultiBlock extends BlockContainer implements IDirectional {
@@ -34,7 +32,6 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
      */
     protected float[] boundingBoxMax = new float[3];
 
-    //TODO remove this default implementation
     /**
      * A list of collision box co-ordinates used by this block that are an array of floats.
      * Position is relative to the block so 0, 0, 0 is the bottom, left, front corner
@@ -45,14 +42,7 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
      * Fifth index is max y (height)
      * Sixth index is max z (depth)
      */
-    public List<float[]> collisionBoxes = new ArrayList<float[]>() {{
-        add(new float[]{0, 0, 0, 0.1875F, 3, 0.1875F}); //Left front post
-        add(new float[]{1.8125F, 0, 0, 2, 3, 0.1875F}); //Right front post
-        add(new float[]{1.8125F, 0, 1.8125F, 2, 3, 2}); //Right back post
-        add(new float[]{0, 0, 1.8125F, 0.1875F, 3, 2}); //Left back post
-        add(new float[]{0, 0, 0, 2, 0.8125F, 2}); //Bed
-        add(new float[]{0, 0, 1.8125F, 2F, 1.5F, 2F}); //Backboard
-    }};
+    public List<float[]> collisionBoxes;
 
     protected BlockMultiBlock(Material material) {
         super(material);
@@ -327,48 +317,63 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List boundingBoxList, Entity entityColliding) {
         TileEntityMultiBlock tileEntity = (TileEntityMultiBlock) world.getTileEntity(x, y, z);
         int facing = world.getBlockMetadata(x, y, z);
+        List<float[]> collisionBoxes = this.collisionBoxes;
 
         if (tileEntity != null) {
-            //Set the origin points to the parent
+            //Call the parent block to get the collision boxes
             if (!tileEntity.isParent) {
                 x = tileEntity.parentX;
                 y = tileEntity.parentY;
                 z = tileEntity.parentZ;
+                world.getBlock(x, y, z).addCollisionBoxesToList(world, x, y, z, aabb, boundingBoxList, entityColliding);
+                return;
             }
         }
         //Loop through and add the collision boxes
-        for (float[] coords : this.collisionBoxes) {
-            if (coords.length == 6) {
-                AxisAlignedBB axisAlignedBB = null;
-                //TODO test this code on other sized structures
-                switch (ForgeDirection.getOrientation(facing)) {
-                    //South
-                    case SOUTH: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0] - 1, y + coords[1], z + coords[2], x + coords[3] - 1, y + coords[4], z + coords[5]);
-                        break;
+        if (collisionBoxes != null && collisionBoxes.size() > 0) {
+            for (float[] coords : collisionBoxes) {
+                if (coords.length == 6) {
+                    AxisAlignedBB axisAlignedBB = null;
+                    //TODO test this code on other sized structures
+                    switch (ForgeDirection.getOrientation(facing)) {
+                        //South
+                        case SOUTH: {
+                            axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0] - 1, y + coords[1], z + coords[2], x + coords[3] - 1, y + coords[4], z + coords[5]);
+                            break;
+                        }
+                        //West
+                        case WEST: {
+                            axisAlignedBB = AxisAlignedBB.getBoundingBox(x - coords[5] + 1, y + coords[1], z + coords[0] - 1, x - coords[2] + 1, y + coords[4], z + coords[3] - 1);
+                            break;
+                        }
+                        //North
+                        case NORTH: {
+                            axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z - coords[5] + 1, x + coords[3], y + coords[4], z - coords[2] + 1);
+                            break;
+                        }
+                        //East
+                        case EAST: {
+                            axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                            break;
+                        }
                     }
-                    //West
-                    case WEST: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x - coords[5] + 1, y + coords[1], z + coords[0] - 1, x - coords[2] + 1, y + coords[4], z + coords[3] - 1);
-                        break;
+                    //axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
+                    if (axisAlignedBB != null && aabb.intersectsWith(axisAlignedBB)) {
+                        boundingBoxList.add(axisAlignedBB);
                     }
-                    //North
-                    case NORTH: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[0], y + coords[1], z - coords[5] + 1, x + coords[3], y + coords[4], z - coords[2] + 1);
-                        break;
-                    }
-                    //East
-                    case EAST: {
-                        axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
-                        break;
-                    }
-                }
-                //axisAlignedBB = AxisAlignedBB.getBoundingBox(x + coords[2], y + coords[1], z + coords[0], x + coords[5], y + coords[4], z + coords[3]);
-                if (axisAlignedBB != null && aabb.intersectsWith(axisAlignedBB)) {
-                    boundingBoxList.add(axisAlignedBB);
                 }
             }
         }
+    }
+
+    public BlockMultiBlock setBoundingBoxMax(float maxWidth, float maxHeight, float maxDepth) {
+        this.boundingBoxMax = new float[] {maxWidth, maxHeight, maxDepth};
+        return this;
+    }
+
+    public BlockMultiBlock setCollisionBoxes(List<float[]> collisionBoxes) {
+        this.collisionBoxes = collisionBoxes;
+        return this;
     }
 
     /**
