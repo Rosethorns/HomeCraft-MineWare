@@ -13,6 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
@@ -88,18 +89,16 @@ public class TileEntityObjRenderer extends TileEntitySpecialRenderer {
         if (tileEntity instanceof ICustomizable) {
             ICustomizable multiPartRender = (ICustomizable) tileEntity;
             //We pass a tesselator so it can all be added to one draw call
-            //Tessellator tessellator = Tessellator.instance;
-            //tessellator.startDrawing(GL11.GL_TRIANGLES);
             for (int pass = 0; pass < this.renderInfo.getRenderPasses(); pass++) {
                 float[] colour = multiPartRender.getRGBAForPass(pass);
                 GL11.glColor4f(colour[0], colour[1], colour[2], colour[3]);
                 Minecraft.getMinecraft().renderEngine.bindTexture(this.renderInfo.getResourceLocForPass(pass));
                 //TODO not have to convert to array
-                List<String> partsForPass = multiPartRender.getPartsForPass(pass);
-                //this.renderInfo.getModel().tessellateOnly(tessellator, partsForPass.toArray(new String[partsForPass.size()]));
+                List<String> partsForPass = new ArrayList<String>();
+                partsForPass.addAll(this.renderInfo.getPartsForPass(pass));
+                partsForPass.addAll(multiPartRender.getPartsForPass(pass));
                 this.renderInfo.getModel().renderOnly(partsForPass.toArray(new String[partsForPass.size()]));
             }
-            //tessellator.draw();
         }
         else {
             Minecraft.getMinecraft().renderEngine.bindTexture(this.renderInfo.getResourceLocForPass(0));

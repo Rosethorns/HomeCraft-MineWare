@@ -20,13 +20,13 @@ colour in a display list and check if it has changed, if so, free the display li
 performance greatly as glcolor can be expensive at times. I like this idea, building caches and freeing them if changed.
 TODO look into this
  */
-//TODO add in getPartsForPass so we have a base set of parts to render then we call the ICustomisable.getPartsForPass for optional ones
 @SideOnly(Side.CLIENT)
 public class RenderInfo {
 
     private final WavefrontObject model;
     private int renderPasses = 1;
     private List<ResourceLocation> resourceLocations = new ArrayList<ResourceLocation>();
+    private List<List<String>> parts = new ArrayList<List<String>>();
 
     public RenderInfo(WavefrontObject model) {
         this.model = model;
@@ -42,6 +42,10 @@ public class RenderInfo {
 
     public ResourceLocation getResourceLocForPass(int renderPass) {
         return this.resourceLocations.get(renderPass);
+    }
+
+    public List<String> getPartsForPass(int renderPass) {
+        return this.parts.get(renderPass);
     }
 
     public WavefrontObject getModel() {
@@ -61,5 +65,14 @@ public class RenderInfo {
     public RenderInfo setRenderPasses(int renderPasses) {
         this.renderPasses = renderPasses;
         return this;
+    }
+
+    /**
+     * Sets the parents for the specified render pass
+     * @param renderPass The render pass
+     * @param parts The parts
+     */
+    public void setPartsForPass(int renderPass, List<String> parts) {
+        this.parts.add(renderPass, parts);
     }
 }
