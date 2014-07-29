@@ -73,6 +73,7 @@ public class HCMWMedieval {
             //No tint
             tileEntityBed.setPartsForPass(0, new ArrayList<String>() {{
                 add("pbed_pillow");
+                add("pbed_mattress");
             }});
             //Wood
             tileEntityBed.setPartsForPass(1, new ArrayList<String>() {{
