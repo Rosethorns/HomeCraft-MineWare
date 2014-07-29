@@ -22,7 +22,6 @@ import java.util.List;
 //TODO less loops plz
 public abstract class BlockMultiBlock extends BlockContainer implements IDirectional {
 
-    //TODO should we store bed data per tile entity or create a new block for each one
     /**
      * This is the dimensions for the structure from the bottom-left-front block facing where it is placed. The coords
      * will be refered as such based on its facing.
@@ -56,12 +55,19 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
 
             //Only make the parent recheck, children are basically dummies
             if (tileEntity.hasParent && !tileEntity.isParent) {
-                //If the structure is no longer valid, break. Block metadata is same as parents
-                if (!this.isStructureValid(world, tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ, tileEntity.getBlockMetadata())) {
-                    //Destroy structure
-                    if (!this.destroyStructure(world, tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ, tileEntity.getBlockMetadata())) {
-                        HCMWCore.logger.warn("Failed to properly delete mutliblock structure, this is very bad!");
+                if (tileEntity.isParentValid()) {
+                    //If the structure is no longer valid, break. Block metadata is same as parents
+                    if (!this.isStructureValid(world, tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ, tileEntity.getBlockMetadata())) {
+                        //Destroy structure
+                        if (!this.destroyStructure(world, tileEntity.parentX, tileEntity.parentY, tileEntity.parentZ, tileEntity.getBlockMetadata())) {
+                            HCMWCore.logger.warn("Failed to properly delete mutliblock structure, this is very bad!");
+                        }
                     }
+                }
+                else {
+                    //Parent doesn't exist, destroy ourself
+                    world.setBlock(x, y, z, Blocks.air);
+                    world.notifyBlockChange(x, y, z, this);
                 }
             }
         }

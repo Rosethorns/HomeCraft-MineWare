@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityMultiBlock extends TileEntityBase {
 
@@ -76,7 +77,24 @@ public class TileEntityMultiBlock extends TileEntityBase {
      * @param tileEntity The parent TE
      */
     public void setParent(TileEntityMultiBlock tileEntity) {
-        setParent(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
+        if (tileEntity != null) this.setParent(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
+        else {
+            this.parentX = this.parentY = this.parentZ = 0;
+            this.hasParent = false;
+        }
+    }
+
+    /**
+     * Check parent is valid
+     * @return If parent exists
+     */
+    public boolean isParentValid() {
+        if (this.isParent) return true;
+        if (this.hasParent) {
+            TileEntity block = this.worldObj.getTileEntity(this.parentX, this.parentY, this.parentZ);
+            if (block instanceof TileEntityMultiBlock) return true;
+        }
+        return false;
     }
 
     @Override
