@@ -8,6 +8,7 @@ import hcmw.core.common.tileentity.TileEntityBase;
 import hcmw.core.proxy.ProxyClient;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -88,16 +89,21 @@ public class TileEntityObjRenderer extends TileEntitySpecialRenderer {
         //If model has multiple render passes
         if (tileEntity instanceof ICustomizable) {
             ICustomizable multiPartRender = (ICustomizable) tileEntity;
-            //We pass a tesselator so it can all be added to one draw call
             for (int pass = 0; pass < this.renderInfo.getRenderPasses(); pass++) {
+                //We pass a tesselator so it can all be added to one draw call per pass
+                Tessellator tesselator = Tessellator.instance;
                 float[] colour = multiPartRender.getRGBAForPass(pass);
-                GL11.glColor4f(colour[0], colour[1], colour[2], colour[3]);
+
+                tesselator.startDrawing(GL11.GL_TRIANGLES);
+                tesselator.setColorRGBA_F(colour[0], colour[1], colour[2], colour[3]);
                 Minecraft.getMinecraft().renderEngine.bindTexture(this.renderInfo.getResourceLocForPass(pass));
-                //TODO not have to convert to array
+
                 List<String> partsForPass = new ArrayList<String>();
                 partsForPass.addAll(this.renderInfo.getPartsForPass(pass));
                 partsForPass.addAll(multiPartRender.getPartsForPass(pass));
-                this.renderInfo.getModel().renderOnly(partsForPass.toArray(new String[partsForPass.size()]));
+                this.renderInfo.getModel().tessellateOnly(tesselator, partsForPass.toArray(new String[partsForPass.size()]));
+
+                tesselator.draw();
             }
         }
         else {
