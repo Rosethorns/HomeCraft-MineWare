@@ -41,11 +41,11 @@ public class RenderInfo {
     }
 
     public ResourceLocation getResourceLocForPass(int renderPass) {
-        return this.resourceLocations.get(renderPass);
+        return this.resourceLocations.size() > renderPass ? this.resourceLocations.get(renderPass) : null;
     }
 
     public List<String> getPartsForPass(int renderPass) {
-        return this.parts.get(renderPass);
+        return this.parts.size() > renderPass ? this.parts.get(renderPass) : new ArrayList<String>();
     }
 
     public WavefrontObject getModel() {
