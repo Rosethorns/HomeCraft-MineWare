@@ -1,11 +1,12 @@
 package hcmw.medieval.proxy;
 
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hcmw.HCMWMedieval;
 import hcmw.core.client.render.RenderInfo;
 import hcmw.core.client.render.TileEntityObjRenderer;
-import hcmw.medieval.client.render.TileEntityBarrelRenderer;
+import hcmw.medieval.client.render.BlockBarrelRenderer;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class ProxyClient extends ProxyCommon {
                     add(1, new ResourceLocation("hcmw", "medieval/textures/pbedwood.png"));
                     add(2, new ResourceLocation("hcmw", "medieval/textures/pbedcloth.png"));
                 }})));
-        hcmw.core.proxy.ProxyClient.tileEntityRenderers.put(HCMWMedieval.MOD_ID + ":barrelInventory", new TileEntityBarrelRenderer(new RenderInfo(new ResourceLocation("hcmw:medieval/model/barrel.obj")).setResourceLocForPass(0, new ResourceLocation("hcmw", "medieval/textures/barrel.png"))));
+        //hcmw.core.proxy.ProxyClient.tileEntityRenderers.put(HCMWMedieval.MOD_ID + ":barrelInventory", new TileEntityBarrelRenderer(new RenderInfo(new ResourceLocation("hcmw:medieval/model/barrel.obj")).setResourceLocForPass(0, new ResourceLocation("hcmw", "medieval/textures/barrel.png"))));
+        RenderingRegistry.registerBlockHandler(new BlockBarrelRenderer());
     }
 }

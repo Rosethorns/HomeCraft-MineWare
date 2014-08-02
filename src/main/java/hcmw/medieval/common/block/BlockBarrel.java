@@ -1,5 +1,6 @@
 package hcmw.medieval.common.block;
 
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import hcmw.HCMWMedieval;
 import hcmw.core.common.block.BlockMultiBlock;
 import hcmw.core.common.block.IDirectional;
@@ -14,13 +15,15 @@ import net.minecraft.world.World;
 
 public abstract class BlockBarrel extends BlockContainer implements IDirectional {
 
+    public final int renderID = RenderingRegistry.getNextAvailableRenderId();
+
     public BlockBarrel() {
         super(Material.wood);
     }
 
     @Override
     public int getRenderType() {
-        return -1;
+        return renderID;
     }
 
     @Override

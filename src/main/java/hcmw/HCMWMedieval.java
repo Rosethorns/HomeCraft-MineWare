@@ -3,6 +3,7 @@ package hcmw;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import hcmw.core.common.block.BlockBedBase;
 import hcmw.core.common.item.ItemBlockMulti;
@@ -15,6 +16,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -104,5 +107,12 @@ public class HCMWMedieval {
         GameRegistry.registerBlock(blockBarrelInventory, blockBarrelInventory.getUnlocalizedName());
 
         proxy.registerRenderers();
+
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @SubscribeEvent
+    public void onTexturePreStitch(TextureStitchEvent.Pre e) {
+        e.map.registerIcon(MOD_ID + ":textures/medieval/textures/barrel.png");
     }
 }
