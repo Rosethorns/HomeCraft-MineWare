@@ -262,7 +262,7 @@ public abstract class BlockMultiBlock extends BlockContainer implements IDirecti
         //Set the block and verify. Use flag 2 here and we don't want to trigger a block update
         if (world.setBlock(posX, posY, posZ, HCMWCore.blockBounding, parentMeta, 2)) {
             TileEntityBounding tileEntityBounding = (TileEntityBounding) world.getTileEntity(posX, posY, posZ);
-            tileEntityBounding.setParent(parentX, parentY, parentZ);
+            tileEntityBounding.setParent(parentX);
         }
     }
 

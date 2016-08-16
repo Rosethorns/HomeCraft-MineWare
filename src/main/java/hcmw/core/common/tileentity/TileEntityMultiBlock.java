@@ -2,15 +2,14 @@ package hcmw.core.common.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nullable;
 
 public class TileEntityMultiBlock extends TileEntityBase {
-
-    public int parentX;
-    public int parentY;
-    public int parentZ;
+    public BlockPos parentPos;
 
     public boolean hasParent;
     public boolean isParent;
@@ -27,7 +26,7 @@ public class TileEntityMultiBlock extends TileEntityBase {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbtTagCompound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound nbtTagCompound) {
         super.writeToNBT(nbtTagCompound);
         nbtTagCompound.setInteger("parentX", this.parentX);
         nbtTagCompound.setInteger("parentY", this.parentY);
@@ -35,19 +34,21 @@ public class TileEntityMultiBlock extends TileEntityBase {
 
         nbtTagCompound.setBoolean("hasParent", this.hasParent);
         nbtTagCompound.setBoolean("isParent", this.isParent);
+
+        return nbtTagCompound;
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-        this.readFromNBT(pkt.func_148857_g());
-        this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        this.readFromNBT(pkt.getNbtCompound());
+        this.worldObj.markBlockForUpdate(getPos());
     }
 
     @Override
-    public Packet getDescriptionPacket() {
+    public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
-        this.writeToNBT(tag);
-        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
+        writeToNBT(tag);
+        return new SPacketUpdateTileEntity(getPos(), 0, tag);
     }
 
     /**
@@ -59,17 +60,18 @@ public class TileEntityMultiBlock extends TileEntityBase {
 
     /**
      * Sets the parent for this TE
-     * @param parentX The parent x co-ord
-     * @param parentY The parent y co-ord
-     * @param parentZ The parent z co-ord
+     * @param pos
      */
-    public void setParent(int parentX, int parentY, int parentZ) {
-        this.parentX = parentX;
-        this.parentY = parentY;
-        this.parentZ = parentZ;
-
-        this.hasParent = true;
-        this.isParent = false;
+    public void setParent(@Nullable BlockPos pos) {
+        if (pos != null) {
+            parentPos = pos;
+            hasParent = true;
+            isParent = false;
+        }
+        else {
+            parentPos = null;
+            hasParent = false;
+        }
     }
 
     /**
@@ -77,11 +79,7 @@ public class TileEntityMultiBlock extends TileEntityBase {
      * @param tileEntity The parent TE
      */
     public void setParent(TileEntityMultiBlock tileEntity) {
-        if (tileEntity != null) this.setParent(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
-        else {
-            this.parentX = this.parentY = this.parentZ = 0;
-            this.hasParent = false;
-        }
+        setParent(tileEntity.parentPos);
     }
 
     /**
@@ -89,16 +87,11 @@ public class TileEntityMultiBlock extends TileEntityBase {
      * @return If parent exists
      */
     public boolean isParentValid() {
-        if (this.isParent) return true;
-        if (this.hasParent) {
-            TileEntity block = this.worldObj.getTileEntity(this.parentX, this.parentY, this.parentZ);
+        if (isParent) return true;
+        if (hasParent) {
+            TileEntity block = worldObj.getTileEntity(parentPos);
             if (block instanceof TileEntityMultiBlock) return true;
         }
         return false;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(this.getClass()) + "[hasParent: " + this.hasParent + ", isParent: " + this.isParent + ", parentX: " + this.parentX + ", parentY: " + this.parentY + ", parentZ: " + this.parentZ + "]";
     }
 }

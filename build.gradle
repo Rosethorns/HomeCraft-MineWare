@@ -5,27 +5,37 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
 
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.0.1"
-group= "hcmw" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+ext {
+    massive = "0"
+    major = "0"
+    minor = "1"
+    mcVersion = "1.10.2"
+    forgeVersion = "12.18.0.2007-1.10.0"
+}
+
+group= "hcmw"
 archivesBaseName = "HomeCraft-MineWare"
+version = "${project.mcVersion}-${project.massive}.${project.major}.${project.minor}"
 
 minecraft {
-    version = "1.7.10-10.13.0.1180"
+    version = "${project.mcVersion}-${project.forgeVersion}"
+    runDir = "run"
+    mappings = "snapshot_20160518"
 }
 
 processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
@@ -37,27 +47,5 @@ processResources {
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
-    }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'src'
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-
-artifacts {
-    archives sourceJar
-    archives deobfJar
-}
-
-jar.doFirst {
-    version = project.minecraft.version + "-" + version;
-    if (System.getenv().BUILD_NUMBER != null) {
-        version += "-" + "${System.getenv().BUILD_NUMBER}"
     }
 }
